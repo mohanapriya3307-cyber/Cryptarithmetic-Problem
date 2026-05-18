@@ -71,12 +71,74 @@ Begin<br>
       return true<br>
    return false<br>
 End<br>
+
+## PROGRAM:
+```
+import itertools
+
+def solve_cryptarithmetic(addends, result, find_all=False, verbose=False):
+    words = addends + [result]
+    letters = []
+    for w in words:
+        for ch in w:
+            if ch not in letters:
+                letters.append(ch)
+
+    if len(letters) > 10:
+        raise ValueError("Too many letters. Max 10 allowed.")
+    leading = {w[0] for w in words}
+
+    def word_value(word, mapping):
+        val = 0
+        for c in word:
+            val = val * 10 + mapping[c]
+        return val
+    solutions = []
+
+    for perm in itertools.permutations(range(10), len(letters)):
+        mapping = dict(zip(letters, perm))
+        if any(mapping[ch] == 0 for ch in leading):
+            continue
+        add_sum = sum(word_value(w, mapping) for w in addends)
+        result_val = word_value(result, mapping)
+
+        if add_sum == result_val:
+            solutions.append(mapping.copy())
+            if not find_all:
+                return mapping
+
+    return solutions if find_all else (solutions[0] if solutions else None)
+
+if __name__ == "__main__":
+
+    addends = ["BASE", "BALL"]
+    result = "GAMES"
+
+    solution = solve_cryptarithmetic(addends, result)
+    if solution:
+        print("\nSolution Found:")
+        for k in sorted(solution):
+            print(f"{k} -> {solution[k]}")
+        def num(word):
+            return int("".join(str(solution[ch]) for ch in word))
+        print("\nCheck:")
+        print(f"{addends[0]} ({num(addends[0])})")
+        print(f"+ {addends[1]} ({num(addends[1])})")
+        print(f"= {result} ({num(result)})")
+
+    else:
+        print("No solution found.")
+```
 <hr>
 <h2>Sample Input and Output:</h2>
 SEND = 9567<br>
 MORE = 1085<br>
 <hr>
 MONEY = 10652<br>
+
+## OUTPUT:
+<img width="453" height="452" alt="image" src="https://github.com/user-attachments/assets/0a4fde7c-cb99-44cd-8909-e9293a6fe849" />
+
 <hr>
 <h2>Result:</h2>
 <p> Thus a Cryptarithmetic Problem was solved using Python successfully</p>
